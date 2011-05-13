@@ -22,6 +22,8 @@
 
 import random, os
 import pygame
+
+from players import Players
 from pygame.locals import *
 
 if __name__ == '__main__' : main()
@@ -54,8 +56,43 @@ def load_sound(name):
 	fullname = os.path.join('data', name)
 	if os.path.exists(fullname) == False:
 		sound = pygame.mixer.Sound(fullname)
-	else
+	else:
 		print 'File %s does not exist!', filename
 		return No_Sound()
 	
 	return sound
+
+def main():
+	random.seed()
+	pygame.init()
+
+	#Creating the display surface..
+	screen = pygame.display.set_mode(800,600)
+	pygame.display.set_caption('Squadron: Yet Another Arcade Game!')
+	pygame.mouse.set_visible(False)
+
+	#Loading game images..
+	backgorund_image, background_rect = load_image('Main_Hud.jpeg') #TODO creating the Main_Hud image!
+	
+	#Loading all game sounds..
+	damage_sound = load_sound(damage)
+	exit_sound = load_sound(exit)
+	expolde_sound = load_sound(explode)
+	lazer_sound = load_sound(lazer)
+	menu_mov_sound = load_sound(menu_move)
+	menu_select_sound = load_sound(menu_select)
+	new_wave_sound = load_sound(newwave)
+	player_dead_sound = load_sound(player_dead)
+	shoot2_sound = load_sound(shoot2)
+	start_sound = load_sound(start)
+	ufo_sound = load_sound(ufo)
+	win_sound = load_sound(win)
+
+
+	#Counters..
+	numberof_hits = 0
+	numberof_kills = 0
+	enemy_killed = 0
+	
+	#Create the game players..
+
