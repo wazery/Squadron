@@ -20,32 +20,46 @@
 # 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # ###################################################
 
-class Players:
+import loader
+class Players(pygame.spirite.Spirite):
 	"""This class is for the game players"""
-	def init(slef, down=False, side= False):
+	def init(slef, screen_width, screen_height, down=False, side= False):
 		pygame.spirite.Spirite.__init__(self) #call spirit initializer
-		if down:
-			self.image, self.rect = load_iamge('player_down.png', -1)
-			self.rect.center = (400,577)
-			self.x_velocity = 0
-			self.y_velocity = 0
-		if side:
-			self.image, self.rect = load_iamge('player_side.png', -1)
-			self.rect.center = (777,300)
-			self.x_velocity = 0
-			self.y_velocity = 0
+		self.screen_width = screen_width
+		self.screen_height = screen_height
 
-	def update(self, down=False, side=False):
-		self.rect.move_ip(self.x_velocity, slef.y_velocity)
-		
-		if down is True: #if player is down corner player, and it reaches te lower bound, reset the location
-			if slef.rect.left < 0:
+		if down is True:
+			self.down = True 
+			self.image, self.rect = loader.load_iamge('player_down.png', -1)
+
+		if side is True:
+			self.side = True
+			self.image, self.rect = loader.load_iamge('player_side.png', -1)
+
+	def update(self):
+		#Get the current keyboard pressed button (state)
+		keystate = pygame.key.get_pressed() 
+
+		if self.down is True: #If player is down corner player, and it reaches te lower bound, reset the location
+			if slef.rect.left < 0: #Check if the player is out of boundary
 				self.rect.left = 0
 			elif slef.rect.right > 800:
 				self.rect.right = 800
-				
-		if side is True:
-			if slef.rect.left < 0:
-				self.rect.left = 0
-			elif slef.rect.right > 600:
-				self.rect.right = 600
+
+			if keystate = [K_LEFT]:
+				self.rect.move_ip(-7,0)
+			if keystate = [K_RIGHT]:
+				self.rect.move_ip(7,0)
+
+		if self.side is True:
+			if slef.rect.bottom < 0:
+				self.rect.bottom = 0
+			elif slef.rect.top > 600:
+
+			if keystate = [K_UP]:
+				self.rect.move_ip(0,-7)
+			if keystate = [K_DOWN]:
+				self.rect.move_ip(7,0)
+	
+		screen_rect = Rect(0, 0, self.screen_width, self.screen_height)
+		self.rect.clamp_ip(SCREENRECT)
