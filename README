@@ -1,0 +1,59 @@
+# ###################################################
+# Copyright (C) 2011 Squadron by Islam Wazery
+# al.wazery@gmail.com
+# This file is part of Squadron.
+#
+# Squadron is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the
+# Free Software Foundation, Inc.,
+# 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+# ###################################################
+
+This is an arcade game which is made to test pygame
+
+Info
+----
+Version: 1.0
+Author: Islam Wazery
+License: GPL v3 (see LICENSE.txt for more details)
+
+
+Running the Game
+----------------
+In Linux open a terminal and "cd" to the game directory and run:
+
+  python run_game.py
+
+On Windows or Mac OS X, locate the "run_game.py" file and double-click it.
+
+Whichever OS you use, you will need Python 2.5+ (no Python 3.x support yet, sorry) and PyGame 1.9+). These can be obtained from http://python.org and http://pygame.org respectively.
+
+
+How to Play the Game
+--------------------
+Blast the invading alien scum to bits with your two trusty drone weapons. You control both at once, using the left and right cursor keys to control the bottom drone, and the up and down cursor keys to control the side drone. 'Z' fires the bottom drone's weapon and 'X' fires the other.
+
+You have a shield that can take 9 direct hits either from an attacking alien or one of their lazer blasts.
+
+There are 9 waves of aliens to show just who is boss. 
+
+Good luck.
+
+
+Thanks
+------
+
+
+Free Software
+-------------
+This game is free software. You can examine the source code and create derivative works. For more information about what free software is, and how it can benefit you, visit: http://www.fsf.org/
