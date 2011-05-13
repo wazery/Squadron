@@ -21,10 +21,12 @@
 # ###################################################
 
 import loader
-class Players(pygame.spirite.Spirite):
+import pygame
+from pygame.locals import *
+class Players(pygame.sprite.Sprite):
 	"""This class is for the game players"""
 	def init(slef, screen_width, screen_height, down=False, side= False):
-		pygame.spirite.Spirite.__init__(self) #call spirit initializer
+		pygame.sprite.Sprite.__init__(self) #call spirit initializer
 		self.screen_width = screen_width
 		self.screen_height = screen_height
 
@@ -46,19 +48,20 @@ class Players(pygame.spirite.Spirite):
 			elif slef.rect.right > 800:
 				self.rect.right = 800
 
-			if keystate = [K_LEFT]:
+			if keystate == [pygame.K_LEFT]:
 				self.rect.move_ip(-7,0)
-			if keystate = [K_RIGHT]:
+			if keystate == [pygame.K_RIGHT]:
 				self.rect.move_ip(7,0)
 
 		if self.side is True:
 			if slef.rect.bottom < 0:
 				self.rect.bottom = 0
 			elif slef.rect.top > 600:
+				self.rect.top = 600
 
-			if keystate = [K_UP]:
+			if keystate == [pygame.K_UP]:
 				self.rect.move_ip(0,-7)
-			if keystate = [K_DOWN]:
+			if keystate == [pygame.K_DOWN]:
 				self.rect.move_ip(7,0)
 	
 		screen_rect = Rect(0, 0, self.screen_width, self.screen_height)
