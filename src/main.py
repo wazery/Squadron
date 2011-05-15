@@ -20,79 +20,189 @@
 # 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # ###################################################
 
-import random, os
+import random
 import pygame
+import loader
 
 from players import Players
+from enemy import enemy
 from pygame.locals import *
 
-if __name__ == '__main__' : main()
-
-def load_image(filename, colorkey=None):
-	filename = os.path.join('data', filename)
-	
-	try:
-		image = pygame.image.load(filename)
-	except pygame.error, message:
-		print 'Cannot load the image: ', filename
-		raise SystemExit, message
-	
-	image = image.convert()
-
-	if colorkey is not None:
-		if colorkey is -1:
-			colorkey = image.get_at((0,0))
-		image.set_colorkey(colorkey, RLEACCEL)
-	
-	return image, image.get_rect()
-
-def load_sound(name):
-	class No_Sound:
-		def play(self) : pass
-	
-	if not pygame.mixer or not pygame.mixer.get_init():
-		return No_Sound()
-	
-	fullname = os.path.join('data', name)
-	if os.path.exists(fullname) == False:
-		sound = pygame.mixer.Sound(fullname)
-	else:
-		print 'File %s does not exist!', filename
-		return No_Sound()
-	
-	return sound
-
 def main():
-	random.seed()
-	pygame.init()
 
-	#Creating the display surface..
-	screen = pygame.display.set_mode(800,600)
-	pygame.display.set_caption('Squadron: Yet Another Arcade Game!')
-	pygame.mouse.set_visible(False)
+    # Game Constants..
+    SCREEN_HEIGHT = 800
+    SCREEN_WIDTH = 600
+    HIGHST_SCORE = 60000
+    BEATEN_HIGH_SCORE = False
 
-	#Loading game images..
-	backgorund_image, background_rect = load_image('Main_Hud.jpeg') #TODO creating the Main_Hud image!
-	
-	#Loading all game sounds..
-	damage_sound = load_sound(damage)
-	exit_sound = load_sound(exit)
-	expolde_sound = load_sound(explode)
-	lazer_sound = load_sound(lazer)
-	menu_mov_sound = load_sound(menu_move)
-	menu_select_sound = load_sound(menu_select)
-	new_wave_sound = load_sound(newwave)
-	player_dead_sound = load_sound(player_dead)
-	shoot2_sound = load_sound(shoot2)
-	start_sound = load_sound(start)
-	ufo_sound = load_sound(ufo)
-	win_sound = load_sound(win)
+    FPS = 60
 
+    NUMBER_OF_LIVES = 6
+    MAX_ENEMIES = 7
+    MAX_PLAYER_BULLETS = 3
+    MAX_ENEMY_BULLETS = 3
+    MAX_UFOS = 4
 
-	#Counters..
-	numberof_hits = 0
-	numberof_kills = 0
-	enemy_killed = 0
-	
-	#Create the game players..
+    # Counters..
+    numberof_hits = 0
+    numberof_kills = 0
+    enemy_killed = 0
 
+    # Game control stuff..
+    GAME_MODE
+    TITLE_SCREEN_MODE = 1
+    GAME_LOOP_MODE = 1
+
+    # Init the game and creating the display surface..
+    pygame.init()
+    random.seed()
+    screen = pygame.display.set_mode(SCREEN_HEIGHT, SCREEN_WIDTH)
+    SCREEN_WIDTH, SCREEN_HEIGHT = sceen.get_size()
+    pygame.display.set_caption('Squadron: Yet Another Arcade Game!')
+    pygame.mouse.set_visible(False)
+
+    # Loading game gfx..
+    backgorund_image, background_rect = loader.load_image('Main_Hud.jpeg') #TODO creating the Main_Hud image!
+    player_bullet_image = loader.load_image('bullet1.png')
+    enemy_bullet_image = loader.load_image('bullet2.png')
+    invader_image = loader.load_image('invader.png')
+    shooter_image = loader.load_image('shooter_enemy.png')
+    transient_image = loader.load_image('Transient.png')
+    ufo_image = loader.load_image('ufo.png')
+    
+    # Create some particle images..
+    red_particle_image = pygame.Surface(8,8)
+    red_particle_image.fill(176,0,0)
+
+    green_particle_image = pygame.Surface(8,8)
+    green_particle_image.fill(31,92,4)
+
+    blue_particle_image = pygame.Surface(8,8)
+    blue_particle_image.fill(46, 102, 187)
+
+    yellow_particle_image = pygame.Surface(8,8)
+    yellow_particle_image.fill(255, 206, 0)
+
+    gray_particle_image = pygame.Surface(8,8)
+    gray_particle_image.fill(88, 88, 88)
+    
+    # Player bullets..
+    player_bullets[]
+    for count in range MAX_PLAYER_BULLETS:
+	player_bullet[count].append(projectile(SCREEN_WIDTH, SCREEN_HEIGHT, player_bullet_image)
+
+    # Enemy bullets..
+    enemy_bullets[]
+    for count in range MAX_ENEMY_BULLETS:
+	enemy_bullets[count].append(projectile(SCREEN_WIDTH, SCREEN_HEIGHT, enemy_bullet_image))
+	enemy_bullets[count].active = False
+
+    # Loading all game sounds..
+    damage_sound = loader.load_sound(damage)
+    exit_sound = loader.load_sound(exit)
+    expolde_sound = loader.load_sound(explode)
+    lazer_sound = loader.load_sound(lazer)
+    menu_mov_sound = loader.load_sound(menu_move)
+    menu_select_sound = loader.load_sound(menu_select)
+    new_wave_sound = loader.load_sound(newwave)
+    player_dead_sound = loader.load_sound(player_dead)
+    shoot2_sound = loader.load_sound(shoot2)
+    start_sound = loader.load_sound(start)
+    ufo_sound = loader.load_sound(ufo)
+    win_sound = loader.load_sound(win)
+
+    # Create the game players..
+    bottom_player = Players(SCREEN_WIDTH, SCREEN_HEIGHT, bottom=True)
+    side_player = Players(SCREEN_WIDTH, SCREEN_HEIGHT, side=True)
+
+    # Prepare enemies..
+   invaders = [] 
+   shooter_invaders = []
+   transient_invaders = []
+
+   for count in range MAX_ENEMIES:
+   	# invaders 
+   	invaders[count].append(enemy(SCREEN_WIDTH, SCREEN_HEIGHT, invader_image))
+   	invaders[count].rect.top = 0
+      	invaders[count].rect.left = 0
+   	invaders[count].rect.vector_x = 0
+   	invaders[count].rect.vector_y = 0
+   	invaders[count].rect.vector_y = 0
+   	invaders[count].rect.active = False
+   	invaders[count].rect.anim_max_frame = 3
+   	invaders[count].rect.movement_type = 0
+
+   	# shooter invaders 
+   	shooter_invaders[count].append(enemy(SCREEN_WIDTH, SCREEN_HEIGHT, shooter_image))
+   	shooter_invaders[count].rect.top = 0
+   	shooter_invaders[count].rect.left = 0
+   	shooter_invaders[count].rect.vector_x = 0
+   	shooter_invaders[count].rect.vector_y = 0
+   	shooter_invaders[count].rect.vector_y = 0
+   	shooter_invaders[count].rect.active = False
+   	shooter_invaders[count].rect.anim_max_frame = 3
+   	shooter_invaders[count].rect.movement_type = 0
+
+   	# transient invaders 
+   	transient_invaders[count].append(enemy(SCREEN_WIDTH, SCREEN_HEIGHT, transient_image))
+   	transient_invaders[count].rect.top = 0
+   	transient_invaders[count].rect.left = 0
+   	transient_invaders[count].rect.vector_x = 0
+   	transient_invaders[count].rect.vector_y = 0
+   	transient_invaders[count].rect.vector_y = 0
+   	transient_invaders[count].rect.active = False
+   	transient_invaders[count].rect.anim_max_frame = 3
+   	transient_invaders[count].rect.movement_type = 0
+    
+    ufos[]
+    for count in range MAX_UFOS:
+	ufos[count].append(enemy(SCREEN_WIDTH, SCREEN_HEIGHT, ufo_image))
+	ufos[count].anim_max_frame = 9
+
+    particles[]
+    for count in range MAX_PARTICLES:
+	particles[count].append(particle(SCREEN_WIDTH, SCREEN_HEIGHT, ))
+
+   
+#<<<><><><><><>||MAIN LOOP||<><><><><><><><>>>#
+#<<<><><><><><><><><><><><><><><><><><><><>>>>#
+
+    main_loop = True
+
+    while main_loop is True:
+
+	# Check the game mode if TITLE_SCREEN_MODE
+	if GAME_MODE == TITLE_SCREEN_MODE:
+
+	    #***********************#
+	    #****||TITLE SCREEN||***#
+	    #***********************#
+
+    	# Game Events...
+	for event in pygame.events.get():
+	    if event.type == QUIT:
+		main_loop = False
+
+		if event.type == KEYDOWN:
+		    if event.key == pygame.K_UP:
+			side_player.update()
+		    elif event.key == pygame.K_DOWN:
+			side_player.update()
+		    elif event.key == pygame.K_LEFT:
+			bottom_player.update()
+		    elif event.key == pygame.K_RIGHT:
+			bottom_player.update()
+		    elif event.key == pygame.K_x:
+			player_bullet.shoot(side=True)
+		    elif event.key == pygame.K_z:
+			player_bullet.shoot(bottom=True)
+		    elif event.key == pygame.K_ESCAPE:
+			game_menu = True
+#		if event.type == K_UP:
+#			if event.key == K_DOWN:
+#			elif event.key == K_LEFT:
+#			elif event.key == K_x:
+#			elif event.key == K_z:
+#			elif event.key == K_ESCAPE:
+#<<<><><><><><><><><><><><><><><><><><><><>>>>#
