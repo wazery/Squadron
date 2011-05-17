@@ -50,9 +50,12 @@ def main():
     enemy_killed = 0
 
     # Game control stuff..
-    GAME_MODE
+    GAME_MODE = 1
     TITLE_SCREEN_MODE = 1
     GAME_LOOP_MODE = 1
+
+    title_menu_choice = 0
+    TITLE_LIT_MESSAGE = True
 
     # Init the game and creating the display surface..
     pygame.init()
@@ -62,6 +65,10 @@ def main():
     pygame.display.set_caption('Squadron: Yet Another Arcade Game!')
     pygame.mouse.set_visible(False)
 
+    # Creating a Font..
+    pygame.font.init()
+    game_font = pygame.font.Font(os.path.join('data', '04b_25__.ttf'), 18)
+
     # Loading game gfx..
     backgorund_image, background_rect = loader.load_image('Main_Hud.jpeg') #TODO creating the Main_Hud image!
     player_bullet_image = loader.load_image('bullet1.png')
@@ -70,7 +77,21 @@ def main():
     shooter_image = loader.load_image('shooter_enemy.png')
     transient_image = loader.load_image('Transient.png')
     ufo_image = loader.load_image('ufo.png')
-    
+
+     # Loading all game sounds..
+    damage_sound = loader.load_sound(damage)
+    exit_sound = loader.load_sound(exit)
+    expolde_sound = loader.load_sound(explode)
+    lazer_sound = loader.load_sound(lazer)
+    menu_mov_sound = loader.load_sound(menu_move)
+    menu_select_sound = loader.load_sound(menu_select)
+    new_wave_sound = loader.load_sound(newwave)
+    player_dead_sound = loader.load_sound(player_dead)
+    shoot2_sound = loader.load_sound(shoot2)
+    start_sound = loader.load_sound(start)
+    ufo_sound = loader.load_sound(ufo)
+    win_sound = loader.load_sound(win)
+
     # Create some particle images..
     red_particle_image = pygame.Surface(8,8)
     red_particle_image.fill(176,0,0)
@@ -88,40 +109,26 @@ def main():
     gray_particle_image.fill(88, 88, 88)
     
     # Player bullets..
-    player_bullets[]
-    for count in range MAX_PLAYER_BULLETS:
+    player_bullets = []
+    for count in range (MAX_PLAYER_BULLETS):
 	player_bullet[count].append(projectile(SCREEN_WIDTH, SCREEN_HEIGHT, player_bullet_image)
 
     # Enemy bullets..
-    enemy_bullets[]
-    for count in range MAX_ENEMY_BULLETS:
+    enemy_bullets = []
+    for count in range (MAX_ENEMY_BULLETS):
 	enemy_bullets[count].append(projectile(SCREEN_WIDTH, SCREEN_HEIGHT, enemy_bullet_image))
 	enemy_bullets[count].active = False
-
-    # Loading all game sounds..
-    damage_sound = loader.load_sound(damage)
-    exit_sound = loader.load_sound(exit)
-    expolde_sound = loader.load_sound(explode)
-    lazer_sound = loader.load_sound(lazer)
-    menu_mov_sound = loader.load_sound(menu_move)
-    menu_select_sound = loader.load_sound(menu_select)
-    new_wave_sound = loader.load_sound(newwave)
-    player_dead_sound = loader.load_sound(player_dead)
-    shoot2_sound = loader.load_sound(shoot2)
-    start_sound = loader.load_sound(start)
-    ufo_sound = loader.load_sound(ufo)
-    win_sound = loader.load_sound(win)
 
     # Create the game players..
     bottom_player = Players(SCREEN_WIDTH, SCREEN_HEIGHT, bottom=True)
     side_player = Players(SCREEN_WIDTH, SCREEN_HEIGHT, side=True)
 
     # Prepare enemies..
-   invaders = [] 
+   invaders = []
    shooter_invaders = []
    transient_invaders = []
 
-   for count in range MAX_ENEMIES:
+   for count in range (MAX_ENEMIES):
    	# invaders 
    	invaders[count].append(enemy(SCREEN_WIDTH, SCREEN_HEIGHT, invader_image))
    	invaders[count].rect.top = 0
@@ -178,6 +185,51 @@ def main():
 	    #***********************#
 	    #****||TITLE SCREEN||***#
 	    #***********************#
+	    
+	    # Render the game title..
+	    screen.blit(game_font.render('Squadron', True, (255, 0, 0), (230, 100)))
+
+	    title_lit_message_timer += 1
+	    if title_lit_message_timer > 30:
+	    	title_lit_message_timer = 0
+		if TITLE_LIT_MESSAGE == True:
+		    TITLE_LIT_MESSAGE = False
+		else:
+		    TITLE_LIT_MESSAGE = True
+
+	    if TITLE_LIT_MESSAGE == True:
+		screen.blit(game_font.render('Insert Coin'), True, (255, 0, 0), (280, 380))
+
+	    if title_menu_choice == 0:
+		screen.blit(game_font.render('Start'), True, (255, 0, 0), (300, 255))
+	    else:
+		screen.blit(game_font.render('Start'), True, (255, 255, 255), (300, 255))
+
+	    if TITLE_LIT_MESSAGE == 1:
+		screen.blit(game_font.render('Exit'), True, (255, 0, 0))
+	    else:
+		screen.blit(game_font.render('Exit'), True, (255, 255, 255))
+
+	    screen.blit(game_font.render(('Z and X to fire, cursor keys to move the battles'), True, (0, 255, 0), (120, 450)
+	
+	# Screen Events...
+	for event in pygame.events.get():
+	    if event.type == QUIT:
+		main_loop = False
+
+		if event.type == KEYDOWN:
+		    if event.key == pygame.K_UP:
+			title_menu_choice += 1
+		    elif event.key == pygame.K_DOWN:
+			title_menu_choice -= 1
+		    elif event.key == pygame.K_ESCAPE:
+			main_loop = False 
+
+	    if event.key == pygame.K_z or event.key == pygame.K_x or event.key == pygame.K_SPACE or event.key == pygame.K_RETURN:
+		if title_menu_choice == 0:
+		    GAME_LOOP_MODE = True
+		    # Start the game
+
 
     	# Game Events...
 	for event in pygame.events.get():
