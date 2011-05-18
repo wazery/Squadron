@@ -33,29 +33,34 @@ def main():
     # Game Constants..
     SCREEN_HEIGHT = 800
     SCREEN_WIDTH = 600
+
     HIGHST_SCORE = 60000
     BEATEN_HIGH_SCORE = False
 
+    TITLE_SCREEN_MODE = 1
+    GAME_MODE = 2
     FPS = 60
 
     NUMBER_OF_LIVES = 6
-    MAX_ENEMIES = 7
-    MAX_PLAYER_BULLETS = 3
-    MAX_ENEMY_BULLETS = 3
-    MAX_UFOS = 4
+    MAX_ENEMIES = 15
+    MAX_PLAYER_BULLETS = 40
+    MAX_ENEMY_BULLETS = 30
+    MAX_UFOS = 1
+    MAX_PARTICLES = 200
 
     # Counters..
     numberof_hits = 0
     numberof_kills = 0
     enemy_killed = 0
+    player_score = 0
+    player_lives = 7
+    player_flash_timer = 0
+    player_flash_on = False
 
     # Game control stuff..
-    GAME_MODE = 1
-    TITLE_SCREEN_MODE = 1
-    GAME_LOOP_MODE = 1
-
+    game_mode = 1
     title_menu_choice = 0
-    TITLE_LIT_MESSAGE = True
+    title_lit_message = True
 
     # Init the game and creating the display surface..
     pygame.init()
@@ -110,12 +115,13 @@ def main():
     
     # Player bullets..
     player_bullets = []
-    for count in range (MAX_PLAYER_BULLETS):
-	player_bullet[count].append(projectile(SCREEN_WIDTH, SCREEN_HEIGHT, player_bullet_image)
+    for count in range(MAX_PLAYER_BULLETS):
+	player_bullets[count].append(projectile(SCREEN_WIDTH, SCREEN_HEIGHT, player_bullet_image)
+	player_bullets[count].active = False
 
     # Enemy bullets..
     enemy_bullets = []
-    for count in range (MAX_ENEMY_BULLETS):
+    for count in range(MAX_ENEMY_BULLETS):
 	enemy_bullets[count].append(projectile(SCREEN_WIDTH, SCREEN_HEIGHT, enemy_bullet_image))
 	enemy_bullets[count].active = False
 
@@ -170,7 +176,6 @@ def main():
     particles[]
     for count in range MAX_PARTICLES:
 	particles[count].append(particle(SCREEN_WIDTH, SCREEN_HEIGHT, ))
-
    
 #<<<><><><><><>||MAIN LOOP||<><><><><><><><>>>#
 #<<<><><><><><><><><><><><><><><><><><><><>>>>#
@@ -182,9 +187,9 @@ def main():
 	# Check the game mode if TITLE_SCREEN_MODE
 	if GAME_MODE == TITLE_SCREEN_MODE:
 
-	    #***********************#
-	    #****||TITLE SCREEN||***#
-	    #***********************#
+	    #-----------------------#
+	    #----||TITLE SCREEN||---#
+	    #-----------------------#
 	    
 	    # Render the game title..
 	    screen.blit(game_font.render('Squadron', True, (255, 0, 0), (230, 100)))
@@ -192,12 +197,12 @@ def main():
 	    title_lit_message_timer += 1
 	    if title_lit_message_timer > 30:
 	    	title_lit_message_timer = 0
-		if TITLE_LIT_MESSAGE == True:
-		    TITLE_LIT_MESSAGE = False
+		if title_lit_message == True:
+		    title_lit_message = False
 		else:
-		    TITLE_LIT_MESSAGE = True
+		    title_lit_message = True
 
-	    if TITLE_LIT_MESSAGE == True:
+	    if title_lit_message == True:
 		screen.blit(game_font.render('Insert Coin'), True, (255, 0, 0), (280, 380))
 
 	    if title_menu_choice == 0:
@@ -205,7 +210,7 @@ def main():
 	    else:
 		screen.blit(game_font.render('Start'), True, (255, 255, 255), (300, 255))
 
-	    if TITLE_LIT_MESSAGE == 1:
+	    if title_lit_message == 1:
 		screen.blit(game_font.render('Exit'), True, (255, 0, 0))
 	    else:
 		screen.blit(game_font.render('Exit'), True, (255, 255, 255))
@@ -227,9 +232,58 @@ def main():
 
 	    if event.key == pygame.K_z or event.key == pygame.K_x or event.key == pygame.K_SPACE or event.key == pygame.K_RETURN:
 		if title_menu_choice == 0:
-		    GAME_LOOP_MODE = True
-		    # Start the game
+		    # Start the games
+		    start_sound.play()
+		    game_mode = GAME_MODE # Switch to the game play mode
+		    attack_timer = 0
+		    attack_max = 70
+		    ufo_attack_timer = 0
+		    ufo_attack_max = 500
+		    max_enemy_speed = 2
+		    game_wave = 1
+		    enemy_killed = 0
+		    wave_break = 100
+		    wave_target_kills = 50
+		    game_over = False
+		    game_over_timer = 500
+		    game_victory = False
+		    game_victory_particle_timer = 0
+		    enemy_fire_timer = 0
+		    enemy_fire_max = 50
+		    title_lit_message_timer = 0
+		    title_lit_message = False
+		    title_menu_choice = 0
+		    player_score = 0
+		    player_lives = 7
+		    player_flash_timer = 0
+		    player_flash_on = False
 
+		    # Deactivate all enimies, particles, bullets
+		    for count in range(MAX_ENEMIES):
+			invaders[count].active = False
+			shooter_enemy[count].active = False
+			transient_invaders[count].active = False
+
+		    for count in range(MAX_PARTICLES):
+			particles[count].active = False
+
+		    for count in range(MAX_PLAYER_BULLETS):
+			player_bullets[count].active = False
+
+		    for count in range(MAX_ENEMY_BULLETS):
+			enemy_bullets[count].active = False
+
+		    for count in range(MAX_UFOS):
+			ufos[count].active = False
+
+		    if title_menu_choice == 1:
+			exit_sound.play()
+			main_loop = False
+	else:
+
+	    #-----------------------#
+	    #-----||GAME MODE||-----#
+	    #-----------------------#
 
     	# Game Events...
 	for event in pygame.events.get():
@@ -245,12 +299,99 @@ def main():
 			bottom_player.update()
 		    elif event.key == pygame.K_RIGHT:
 			bottom_player.update()
-		    elif event.key == pygame.K_x:
-			player_bullet.shoot(side=True)
-		    elif event.key == pygame.K_z:
-			player_bullet.shoot(bottom=True)
+		    elif event.key == pygame.K_x: and player_fire_delay_left > player_fire_delay_time and game_over == False:
+			for count in range(MAX_PLAYER_BULLETS):
+			    player_bullets[count].active = True
+			    player_bullets[count].vector_x = -9
+			    player_bullets[count].vector_y = 0
+			    player_bullets[count].
+			    lazer_sound.play()
+			    break
+
+		    elif event.key == pygame.K_z and player_fire_delay_left > player_fire_delay_time and game_over == False:
+			for count in range(MAX_PLAYER_BULLETS):
+			    player_bullets[count].active = True
+			    player_bullets[count].vector_x = 0
+			    player_bullets[count].vector_y = -9
+			    player_bullets[count].
+			    lazer_sound.play()
+			    break
+
 		    elif event.key == pygame.K_ESCAPE:
-			game_menu = True
+			game_mode = TITLE_SCREEN_MODE # Switch back to the title screen
+
+		attack_timer += 1
+		ufo_attack_timer += 1
+
+		if attack_timer > attack_max and wave_break < 1 and enemy_killed < wave_target_kills and game_over == False:
+		    attack_timer = 0
+		    
+		    if game_wave > 2:
+			enemy_type = random.randint(0, 2)
+		    else:
+			enemy_type = random.randint(0, 1)
+
+		    direction = random.randint(0, 1)
+		    if enemy_type == 0:
+			for count in range(MAX_ENEMIES):
+			    if invaders[count].active == False:
+				if direction == 0: # if enemies come from left
+				    invaders[count].rect.left = -32
+				    invaders[count].rect.top = random.randint(0, (SCREEN_HEIGHT - 64) / 32) * 32
+				    invaders[count].vector_x = max_enemy_speed
+				    invaders[count].vector_y = 0
+				    invaders[count].active = True
+				    break
+				else: # if enemies come from top
+				    invaders[count].rect.left = random.randint(0, (SCREEN_WIDTH - 64) / 32) * 32
+				    invaders[count].vector_x = 0
+				    invaders[count].vector_y = max_enemy_speed
+				    invaders[count].active = True
+				    break
+
+		    elif enemy_type == 1:
+			for count in range(MAX_ENEMIES):
+			    if shooter_invaders[count].active = False:
+				if direction == 0: # if enemies come from left
+				    shooter_invaders[count].rect.left = -32
+				    shooter_invaders[count].rect.top = random.randint(0, (SCREEN_HEIGHT - 64) / 32) * 32
+				    shooter_invaders[count].vector_x = max_enemy_speed
+				    shooter_invaders[count].vector_y = 0
+				    shooter_invaders[count].active = True
+				    shooter_invaders[count].movement_type = 2
+				    break
+				else: # if enemies come from top
+				    shooter_enemy[count].rect.left = random.randint(0, (SCREEN_WIDTH - 64) / 32) * 32
+				    shooter_enemy[count].rect.top = -32
+				    shooter_enemy[count].vector_x = 0
+				    shooter_enemy[count].vector_y = max_enemy_speed
+				    shooter_enemy[count].movement_type = 1
+				    shooter_enemy[count].movement_type = 1
+				    break
+		    elif enemy_type == 2:
+			for count in range(MAX_ENEMIES):
+			    if shooter_invaders[count].active = False:
+				if direction == 0: # if enemies come from left
+				    transient_invaders[count].rect.left = -32
+				    transient_invaders[count].rect.top = random.randint(0, (SCREEN_HEIGHT - 64) / 32) * 32
+				    transient_invaders[count].vector_x = max_enemy_speed
+				    transient_invaders[count].vector_y = 0
+				    transient_invaders[count].active = True
+				    break
+				else: # if emeimes come from top
+				    transient_invaders[count].rect.left = random.randint(0, SCREEN_WIDTH - 64) / 32) * 32
+				    transient_invaders[count].rect.top = -32
+				    transient_invaders[count].vector_x = max_enemy_speed
+				    transient_invaders[count].vector_y = 0
+				    transient_invaders[count].active = True
+				    break
+
+		# ufo attacks..
+		for count in range(MAX_UFOS):
+		    if ufos[count].active == False and ufo_attack_timer > ufo_attack_max and wave_break < 1 and game_over == False:
+			ufo_attack_timer = 0
+			ufo_sound.play()
+			    ufos[count].rect.left = 
 #		if event.type == K_UP:
 #			if event.key == K_DOWN:
 #			elif event.key == K_LEFT:
