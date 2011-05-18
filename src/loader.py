@@ -1,4 +1,4 @@
-# file: main.py	--> The main module
+# file: loader.py	--> The loader module
 # ###################################################
 # Copyright (C) 2011 Squadron by Islam Wazery
 # al.wazery@gmail.com
