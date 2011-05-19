@@ -43,7 +43,7 @@ def main():
 
     NUMBER_OF_LIVES = 6
     MAX_ENEMIES = 15
-    MAX_PLAYER_BULLETS = 40
+    PLAYER_BULLETS = 40
     MAX_ENEMY_BULLETS = 30
     MAX_UFOS = 1
     MAX_PARTICLES = 200
@@ -348,12 +348,11 @@ def main():
 				    invaders[count].vector_y = max_enemy_speed
 				    invaders[count].active = True
 				    break
-
 		    elif enemy_type == 1:
 			for count in range(MAX_ENEMIES):
 			    if shooter_invaders[count].active = False:
 				if direction == 0: # if enemies come from left
-				    shooter_invaders[count].rect.left = -32
+				    shooter_invaders[count].rect.left = -32 # 32 is the icon size
 				    shooter_invaders[count].rect.top = random.randint(0, (SCREEN_HEIGHT - 64) / 32) * 32
 				    shooter_invaders[count].vector_x = max_enemy_speed
 				    shooter_invaders[count].vector_y = 0
@@ -391,7 +390,68 @@ def main():
 		    if ufos[count].active == False and ufo_attack_timer > ufo_attack_max and wave_break < 1 and game_over == False:
 			ufo_attack_timer = 0
 			ufo_sound.play()
-			    ufos[count].rect.left = 
+			if random.randint(0, 10) > 4: # Attacking the side player
+			    if random.randint(0, 10) > 4:
+				ufos[count].rect.left = SCREEN_WIDTH - 32
+				ufos[count].rect.top = -32
+				ufos[count].vector_x = 0
+				ufos[count].vector_y = max_ufo_speed
+				ufos[count].active = True
+			    else:
+				ufos[count].rect.left = SCREEN_WIDTH -32
+				ufos[count].rect.top = SCREEN_HEIGHT + 32
+				ufos[count].vector_x = max_ufo_speed
+				ufos[count].vector_y = 0
+				ufos[count].active = True
+			else: # Attacking the bottom player
+			    if random.randint(0, 10) > 4:
+				ufos[count].rect.left = SCREEN_WIDTH+ 32
+				ufos[count].rect.top = SCREEN_HEIGHT - 32
+				ufos[count].rect.vector_x = max_enemy_speed
+				ufos[count].rect.vector_y = 0
+				ufos[count].rect.active = True
+
+		# Render the particles..
+		for count in range(MAX_PARTICLES):
+		    if particle[count].active == True:
+			particle[count].update()
+			screen.blit(particle[count].image, particle[count].rect)
+
+		player_bottom.update()
+		player_side.update() 
+		
+		# If player recovers from damage
+		if player_flash_timer > 0:
+		    player_flash_on -= 1
+		    if player_flash_on = True:
+			player_flash_on = False
+		    else:
+			player_flash_on = True
+		else:
+		    player_flash_on = False
+		
+		# Render all the player projectiles
+		for count in range(PLAYER_BULLETS):
+		    if (player_bullets[count].active):
+			player_bullets[count].update()
+		    screen.blit(player_bullets[count].image, player_bullets[count].rect)
+
+		# Render all the enemies projectiles
+		for count in range(MAX_ENEMY_BULLETS):
+		    if (enemy_bullets[count].active):
+			enemy_bullets[count].update
+		    screen.blit(enemy_bullets[count].image, enemy_bullets[count].rect)
+
+
+		# Render the players
+		if player_flash_on == False and game_over == False:
+		    screen.blit(playe)
+		    
+		#    # Game Hack..
+                #    if event.key == pygame.K_t:
+		#	player_flash_on = True
+		#	player_flash_timer = 50000
+
 #		if event.type == K_UP:
 #			if event.key == K_DOWN:
 #			elif event.key == K_LEFT:
