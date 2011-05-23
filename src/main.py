@@ -502,13 +502,95 @@ def main():
 		if enemy_fire_timer > enemy_fire_max and game_over == False:
 		    enemy_fire_timer = 0
 		    for count in range(MAX_ENEMIES):
-			if shooter_enemy[count].active == True and shooter_enemy[count].rect.top < 
+			if shooter_enemy[count].active == True and shooter_enemy[count].rect.top < SCREEN_HEIGHT - 50 and shooter_invaders[count].rect.top > 50:
 			    shoot2_sound.play()
 			    bullets = 0
 			    for bullet_count in range(MAX_ENEMY_BULLETS):
-				if enemy_bullets[bullet_count]
-				    bullets += 1
+				if enemy_bullets[bullet_count].active == False:
+				    if random.randint(0, 10) > 4:
+					enemy_bullets[bullet_count].active = True
+					enemy_bullets[bullet_count].vector_x = 7
+					enemy_bullets[bullet_count].vector_y = 0
+					enemy_bullets[bullet_count].rect.top = shooter_invaders[count].rect.top + 8
+					enemy_bullets[bullet_count].rect.left = shooter_invaders[count].rect.left + 12
+					break
+				    else:
+					enemy_bullets[bullet_count].active = True
+					enemy_bullets[bullet_count].vector_x = 0
+					enemy_bullets[bullet_count].vector_y = 7
+					enemy_bullets[bullet_count].rect.top = shooter_invaders[count].rect.top + 16
+					enemy_bullets[bullet_count].rect.left = shooter_invaders[count].rect.left + 8
+					break
 
+		# Check for player and invaders collisions..
+		if player_flash_timer < 1 and game_over == False:
+		    player_hit = False
+		for collision_count in range(MAX_ENEMIES):
+		    if invaders[collision_count].active:
+			if player_side.rect.colliderect(invaders[collision_count].rect.left + 5, invaders[collision_count].rect.top + 5, 24, 24):
+			    invaders[collision_count].active = False
+			    create_particles(15, invaders[collision_count].rect.left + 8, invaders[collision_count].rect.top + 8, green_particle_image)
+			    player_hit = True
+			if player_bottom.rect.colliderect(invaders[collision_count].rect.left + 5, invaders[collision_count].rect.top + 5, 24, 24):)
+			    invaders[collision_count].active = False
+			    create_particles(15, invaders[collision_count].rect.left + 8, invaders[collision_count].rect.top + 8, green_particle_image)
+			    player_hit = True
+
+		# Check for player and shooter_invaders collisions..
+		if player_flash_timer < 1 and game_over == False:
+		    player_hit = False
+		for collision_count in range(MAX_ENEMIES):
+		    if invaders[collision_count].active:
+			if player_side.rect.colliderect(shooter_invaders[collision_count].rect.left + 5, shooter_invaders[collision_count].rect.top + 5, 24, 24):
+			    shooter_invaders[collision_count].active = False
+			    create_particles(15, shooter_invaders[collision_count].rect.left + 8, shooter_invaders[collision_count].rect.top + 8, red_particle_image)
+			    player_hit = True
+			if player_bottom.rect.colliderect(shooter_invaders[collision_count].rect.left + 5, shooter_invaders[collision_count].rect.top + 5, 24, 24):)
+			    shooter_invaders[collision_count].active = False
+			    create_particles(15, shooter_invaders[collision_count].rect.left + 8, shooter_invaders[collision_count].rect.top + 8, red_particle_image)
+			    player_hit = True
+
+		# Check for player and transient_invaders collisions..
+		if player_flash_timer < 1 and game_over == False:
+		    player_hit = False
+		for collision_count in range(MAX_ENEMIES):
+		    if transient_invaders[collision_count].active:
+			if player_side.rect.colliderect(transient_invaders[collision_count].rect.left + 5, transient_invaders[collision_count].rect.top + 5, 24, 24):
+			    transient_invaders[collision_count].active = False
+			    create_particles(15, transient_invaders[collision_count].rect.left + 8, transient_invaders[collision_count].rect.top + 8, blue_particle_image)
+			    player_hit = True
+			if player_bottom.rect.colliderect(transient_invaders[collision_count].rect.left + 5, transient_invaders[collision_count].rect.top + 5, 24, 24):)
+			    transient_invaders[collision_count].active = False
+			    create_particles(15, transient_invaders[collision_count].rect.left + 8, transient_invaders[collision_count].rect.top + 8, blue_particle_image)
+			    player_hit = True
+
+		# Check for player and ufos collisions..
+		if player_flash_timer < 1 and game_over == False:
+		    player_hit = False
+		for collision_count in range(MAX_ENEMIES):
+		    if ufos[collision_count].active:
+			if player_side.rect.colliderect(ufos[collision_count].rect.left + 5, ufos[collision_count].rect.top + 5, 24, 24):
+			    ufos[collision_count].active = False
+			    create_particles(15, ufos[collision_count].rect.left + 8, ufos[collision_count].rect.top + 8, red_particle_image)
+			    player_hit = True
+			if player_bottom.rect.colliderect(ufos[collision_count].rect.left + 5, ufos[collision_count].rect.top + 5, 24, 24):)
+			    ufos[collision_count].active = False
+			    create_particles(15, ufos[collision_count].rect.left + 8, ufos[collision_count].rect.top + 8, gray_particle_image)
+			    player_hit = True
+
+		# Check for player and enemy_bullets collisions..
+		for collision_count in range(MAX_ENEMY_BULLETS):
+		    if enemy_bullets[collision_count].active:
+			if player_side.rect.colliderect(enemy_bullets[collision_count].rect.left, enemy_bullets[collision_count].rect.top, 8, 8):
+			    enemy_bullets[collision_count].active = False
+			    player_hit = enemy_bullets
+			if player_bottom.rect.colliderect(ufos[collision_count].rect.left, enemy_bullets[collision_count].rect.top, 8, 8):
+			    enemy_bullets[collision_count].active = False
+			    player_hit = True
+
+	pygame.display.flip()
+
+	clock.tick(FPS)
 		#    # Game Hack..
                 #    if event.key == pygame.K_t:
 		#	player_flash_on = True
