@@ -437,11 +437,11 @@ def main():
 			enemy_bullets[count].update
 		    screen.blit(enemy_bullets[count].image, enemy_bullets[count].rect)
 
-		# Increase the delay for the players fire
+		# Increase the delay for the players fire..
 		player_fire_delay_left += 1
 		player_fire_delay_right += 1
 
-		# Update the invaders (move and draw)
+		# Update the invaders (move and draw)..
 		for count in range(MAX_ENEMIES):
 		    if invaders[count].active:
 			invaders[count].update()
@@ -457,7 +457,7 @@ def main():
 				    expolde_sound.play()
 				    player_score += 2000
 
-		# Update the red invaders (move and draw)
+		# Update the red invaders (move and draw)..
 		for count in range(MAX_ENEMIES):
 		    if shooter_invaders[count].active:
 			shooter_invaders[count].update()
@@ -471,7 +471,7 @@ def main():
 				player_score += 4750
 				enemy_killed -= 1
 
-		# Update the transient invaders (move and draw)
+		# Update the transient invaders (move and draw)..
 		for count in range(MAX_ENEMIES):
 		    if transient_invaders[count].active:
 			for count in range(player_bullets):
@@ -483,7 +483,7 @@ def main():
 				player_score += 2500
 				enemy_killed += 1
 
-		# Update the ufos (move and draw)
+		# Update the ufos (move and draw)..
 		for count in range(MAX_UFOS):
 		    if ufos[count].active:
 			ufos[count].update()
@@ -588,12 +588,148 @@ def main():
 			    enemy_bullets[collision_count].active = False
 			    player_hit = True
 
+		# Display hud stuff..
+                screen.blit(game_font.render("Score: " + str(player_score), 0, ((255, 206, 0))), (10, 10))
+	        screen.blit(game_font.render("High Score: " + str(high_score), 0, ((255, 206, 0))
+
+		# Check for player and enything collisions..
+		if player_hit == True and game_over == False:
+		    player_shield -= 1
+		    create_particles(5, 85 + (player_shield * 11), 32, red_particle_image)
+		    player_flash_timer = 60
+		    player_dead_sound.play()
+		    if player_shield == 0:
+			create_particles(20, player_bottom.rect.left + 8, player_bottom.rect.top + 8, red_particle_image)
+			create_particles(20, player_bottom.rect.left + 8, player_bottom.rect.top + 8, gray_particle_image)
+			create_particles(20, player_side.rect.left + 8, player_side.rect.top + 8, blue_particle_image)
+			create_particles(20, player_side.rect.left + 8, player_side.rect.top + 8, yellow_particle_image)
+			player_dead_sound.play()
+			game_over = True
+
+	    #NOTE: BOOKMARK HERE!
+            # Beaten high score?
+            if player_score > high_score:
+                high_score = player_score
+                # Make a little fuss of the player :)
+                if beaten_high_score == False:
+                    beaten_high_score = True
+                    for count in range(5):
+                        create_particles(5, 460 + (count * 15), 15, yellow_particle_image)                        
+                
+            if wave_break > 0:
+                wave_break -= 1
+                if game_over == False:
+                    screen.blit(game_font_large.render("Wave " + str(game_wave) + " of 9", 0, ((255, 206, 0))), (240, SCREEN_HEIGHT / 2 - 36))        
+
+            for count in range(player_shield):
+                screen.blit(game_font.render("Shields:", 0, ((255, 206, 0))), (10, 30))
+                screen.blit(player_health_image, (85 + (count * 11), 32))
+            
+            if game_over == True:
+                # Loss or victory?
+                if game_victory == False:
+                    screen.blit(game_font_large.render("GAME OVER", 0, ((176, 0, 0))), (260, SCREEN_HEIGHT / 2 - 36))
+                else:
+                    screen.blit(game_font_large.render("YOU ARE AWESOME!!!", 0, ((255, 206, 0))), (160, SCREEN_HEIGHT / 2 - 36))
+                    game_victory_particle_timer += 1
+                    if game_victory_particle_timer > 10:
+                        create_particles(30, random.randint(160, 450), random.randint(160, 300), red_particle_image)                       
+                        
+                game_over_timer -= 1
+                if game_over_timer == 0:
+                    game_mode = TITLE_SCREEN_MODE
+                    
+            # Time for a new wave? Only start new wave display when all enemies are dead
+            enemies_onscreen = False
+            for count in range(MAX_BADDIES):
+                if invaders[count].active == True:
+                    enemies_onscreen = True
+                    break
+                if shooter_invaders[count].active == True:
+                    enemies_onscreen = True
+                    break
+                if drones[count].active == True:
+                    enemies_onscreen = True
+                    break
+                
+            for count in range(MAX_UFOS):
+                if ufos[count].active == True:
+                    enemies_onscreen = True
+
+            if enemies_killed > wave_target_kills and enemies_onscreen == False and game_over == False:
+                wave_break = 300
+                wave_target_kills += 10
+                game_wave += 1
+                if game_wave == 10:
+                    game_over = True
+                    game_victory = True
+                    game_over_timer = 700
+                    win_sound.play()
+                    
+                enemies_killed = 0
+                
+                # Make the next round a bit harder :)
+                if attack_max > 30:
+                    attack_max -= 10
+                if ufo_attack_max > 0:
+                    ufo_attack_max -= 50
+                if game_wave > 6:
+                    baddie_fire_rate = 10
+                wave_sound.play()        screen.blit(game_font_large.render("YOU ARE AWESOME!!!", 0, ((255, 206, 0))), (160, SCREEN_HEIGHT / 2 - 36))
+                    game_victory_particle_timer += 1
+                    if game_victory_particle_timer > 10:
+                        create_particles(30, random.randint(160, 450), random.randint(160, 300), red_particle_image)                       
+                        
+                game_over_timer -= 1
+                if game_over_timer == 0:
+                    game_mode = TITLE_SCREEN_MODE
+                    
+            # Time for a new wave? Only start new wave display when all enemies are dead
+            enemies_onscreen = False
+            for count in range(MAX_BADDIES):
+                if invaders[count].active == True:
+                    enemies_onscreen = True
+                    break
+                if shooter_invaders[count].active == True:
+                    enemies_onscreen = True
+                    break
+                if drones[count].active == True:
+                    enemies_onscreen = True
+                    break
+                
+            for count in range(MAX_UFOS):
+                if ufos[count].active == True:
+                    enemies_onscreen = True
+
+            if enemies_killed > wave_target_kills and enemies_onscreen == False and game_over == False:
+                wave_break = 300
+                wave_target_kills += 10
+                game_wave += 1
+                if game_wave == 10:
+                    game_over = True
+                    game_victory = True
+                    game_over_timer = 700
+                    win_sound.play()
+                    
+                enemies_killed = 0
+                
+                # Make the next round a bit harder :)
+                if attack_max > 30:
+                    attack_max -= 10
+                if ufo_attack_max > 0:
+                    ufo_attack_max -= 50
+                if game_wave > 6:
+                    baddie_fire_rate = 10
+                wave_sound.play()
+
 	pygame.display.flip()
 
 	clock.tick(FPS)
+
 		#    # Game Hack..
                 #    if event.key == pygame.K_t:
 		#	player_flash_on = True
 		#	player_flash_timer = 50000
+
     pygame.quit()
 #<<<><><><><><><><><><><><><><><><><><><><>>>>#
