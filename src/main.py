@@ -24,8 +24,10 @@ import random
 import pygame
 import loader
 
+from projectile import Projectile
 from players import Players
-from enemy import enemy
+from enemy import Enemy
+from particle import Particle
 from pygame.locals import *
 
 def main():
@@ -258,7 +260,7 @@ def main():
 		    player_flash_timer = 0
 		    player_flash_on = False
 
-		    # Deactivate all enimies, particles, bullets
+		    # Deactivate all enemies, particles, bullets
 		    for count in range(MAX_ENEMIES):
 			invaders[count].active = False
 			shooter_enemy[count].active = False
@@ -291,14 +293,6 @@ def main():
 		main_loop = False
 
 		if event.type == KEYDOWN:
-		    if event.key == pygame.K_UP:
-			side_player.update()
-		    elif event.key == pygame.K_DOWN:
-			side_player.update()
-		    elif event.key == pygame.K_LEFT:
-			bottom_player.update()
-		    elif event.key == pygame.K_RIGHT:
-			bottom_player.update()
 		    elif event.key == pygame.K_x: and player_fire_delay_left > player_fire_delay_time and game_over == False:
 			for count in range(MAX_PLAYER_BULLETS):
 			    player_bullets[count].active = True
@@ -323,7 +317,7 @@ def main():
 		attack_timer += 1
 		ufo_attack_timer += 1
 
-		if attack_timer > attack_max and wave_break < 1 and enemy_killed < wave_target_kills and game_over == False:
+		if attack_timer > attack_max and wave_break < 1 and enemy_killed < wave_target_kills and game_over == False:	
 		    attack_timer = 0
 		    
 		    if game_wave > 2:
@@ -377,7 +371,7 @@ def main():
 				    transient_invaders[count].vector_y = 0
 				    transient_invaders[count].active = True
 				    break
-				else: # if emeimes come from top
+				else: # if enemies come from top
 				    transient_invaders[count].rect.left = random.randint(0, SCREEN_WIDTH - 64) / 32) * 32
 				    transient_invaders[count].rect.top = -32
 				    transient_invaders[count].vector_x = max_enemy_speed
@@ -416,11 +410,12 @@ def main():
 		    if particle[count].active == True:
 			particle[count].update()
 			screen.blit(particle[count].image, particle[count].rect)
-
+		
+		# Update the players due to their key events..
 		player_bottom.update()
 		player_side.update() 
 		
-		# If player recovers from damage
+		# If player recovers from damage..
 		if player_flash_timer > 0:
 		    player_flash_on -= 1
 		    if player_flash_on = True:
@@ -430,32 +425,93 @@ def main():
 		else:
 		    player_flash_on = False
 		
-		# Render all the player projectiles
+		# Render all the player projectiles..
 		for count in range(PLAYER_BULLETS):
 		    if (player_bullets[count].active):
 			player_bullets[count].update()
 		    screen.blit(player_bullets[count].image, player_bullets[count].rect)
 
-		# Render all the enemies projectiles
+		# Render all the enemies projectiles..
 		for count in range(MAX_ENEMY_BULLETS):
 		    if (enemy_bullets[count].active):
 			enemy_bullets[count].update
 		    screen.blit(enemy_bullets[count].image, enemy_bullets[count].rect)
 
+		# Increase the delay for the players fire
+		player_fire_delay_left += 1
+		player_fire_delay_right += 1
 
-		# Render the players
-		if player_flash_on == False and game_over == False:
-		    screen.blit(playe)
-		    
+		# Update the invaders (move and draw)
+		for count in range(MAX_ENEMIES):
+		    if invaders[count].active:
+			invaders[count].update()
+			screen.blit(invaders[count].image, invaders[count].rect, (32 * invaders[count].anim_frame, 0, 32, 32))
+			# Check the invader collision with any player_bullets
+			for collision_count in range(PLAYER_BULLETS):
+			    if player_bullets[collision_count].active:
+				if player_bullets[collision_count].rect.colliderect(invaders[count].rect, player_bullets[count].rect)
+				    invaders[count].active = False
+				    create_particles(15, invaders[count].rect.left + 8, invaders[count].rect.top + 8, green_particle_image
+				    player_bullets[collision_count].active = False
+				    enemy_killed += 1
+				    expolde_sound.play()
+				    player_score += 2000
+
+		# Update the red invaders (move and draw)
+		for count in range(MAX_ENEMIES):
+		    if shooter_invaders[count].active:
+			shooter_invaders[count].update()
+			screen.blit(shooter_invaders[count].image, shooter_invaders[count].rect, player_bullets[count].rect)
+			for collision_count in range(player_bullets):
+			    if player_bullets[collision_count].rect.colliderect(shooter_invaders[count].rect, player_bullets[count]):
+				shooter_invaders[count].active = False
+				create_particles(15, shooter_invaders[count].rect.left + 8, shooter_invaders[count].rect.top + 8, red_particle_image)
+				player_bullets[collision_count].active = False
+				expolde_sound.play()
+				player_score += 4750
+				enemy_killed -= 1
+
+		# Update the transient invaders (move and draw)
+		for count in range(MAX_ENEMIES):
+		    if transient_invaders[count].active:
+			for count in range(player_bullets):
+			    if player_bullets[collision_count].rect.colliderect(transient_invaders[count], player_bullets[count]):
+				transient_invaders[count].active = False
+				create_particles(15, transient_invaders[count].rect.left + 8, transient_invaders[count].top + 8)
+				player_bullets[collision_count].active = False
+				expolde_sound.play()
+				player_score += 2500
+				enemy_killed += 1
+
+		# Update the ufos (move and draw)
+		for count in range(MAX_UFOS):
+		    if ufos[count].active:
+			ufos[count].update()
+			screen.blit(ufos[count].image, ufos[count].rect, (32 * ufos[count].anim_frame, 0, 32, 32))
+			for count in range(player_bullets):
+			    if player_bullets[collision_count].rect.colliderect(transient_invaders[count], player_bullets[count]):
+				ufos[count].active = False
+				create_particles(15, ufos[count].rect.left + 8, ufos[count].top + 8)
+				player_bullets[collision_count].active = False
+				expolde_sound.play()
+				player_score += 3250
+				enemy_killed += 1
+		
+		# How nmuch the shooter_invaders take to shoot?
+		enemy_fire_timer += 1
+		if enemy_fire_timer > enemy_fire_max and game_over == False:
+		    enemy_fire_timer = 0
+		    for count in range(MAX_ENEMIES):
+			if shooter_enemy[count].active == True and shooter_enemy[count].rect.top < 
+			    shoot2_sound.play()
+			    bullets = 0
+			    for bullet_count in range(MAX_ENEMY_BULLETS):
+				if enemy_bullets[bullet_count]
+				    bullets += 1
+
 		#    # Game Hack..
                 #    if event.key == pygame.K_t:
 		#	player_flash_on = True
 		#	player_flash_timer = 50000
-
-#		if event.type == K_UP:
-#			if event.key == K_DOWN:
-#			elif event.key == K_LEFT:
-#			elif event.key == K_x:
-#			elif event.key == K_z:
-#			elif event.key == K_ESCAPE:
+    pygame.quit()
 #<<<><><><><><><><><><><><><><><><><><><><>>>>#
