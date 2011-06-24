@@ -482,10 +482,10 @@ def main():
 				ufos[count].active = True
 			else: # Attacking the bottom player
 			    if random.randint(0, 10) > 4:
-				ufos[count].rect.left = 32
 				ufos[count].rect.top = SCREEN_HEIGHT - 32
-				ufos[count].rect.vector_x = max_ufo_speed
-				ufos[count].rect.vector_y = 0
+				ufos[count].rect.left = - 32
+				ufos[count].vector_x = max_ufo_speed
+				ufos[count].vector_y = 0
 				ufos[count].rect.active = True
 			    else:
 				ufos[count].rect.top = SCREEN_HEIGHT -32
